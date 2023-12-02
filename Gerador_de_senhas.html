@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keywords" content="Gerador de Senha">
+    <title>Gerador de Senha</title>
+
+    <!--::::::::::::::::::::Meu Estilo::::::::::::::::::::-->
+    <style>
+        @font-face {
+            font-family: "arcanum";
+            src: url(ARCANUM.TTF);
+        }
+
+        @font-face {
+            font-family: aller;
+            src: url(ALLER.TTF);
+        }
+
+        * {
+            margin: 0;
+            padding: 0 auto;
+            font-family: aller, sans-serif;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(0deg, transparent, rgba(30, 143, 255, 0.800), rgba(30, 143, 255, 0.950), dodgerblue);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        h1 {
+            font-size: 2.3em;
+            font-family: arcanum, tahoma;
+            color: #fff;
+            text-shadow: 2px 2px 5px #555;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .container-input {
+            text-align: center;
+            max-width: 400px;
+            margin: 20px 0;
+        }
+
+        .container-input span {
+            color: #fff;
+            font-size: 1.5em;
+        }
+
+        .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 15px;
+            background-color: #fff;
+            border-radius: 7px;
+            margin-top: 10px;
+            outline: none;
+        }
+
+        .botao {
+            height: 40px;
+            border: 0;
+            background-color: aqua;
+            color: rgba(0, 0, 0, 0.700);
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 7px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .botao:hover {
+            background-color: aquamarine;
+        }
+
+        .container-senha {
+            max-width: 400px;
+            margin: 5px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .titulo {
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: 500;
+            color: #fff;
+            text-shadow: 1px 1px 1px #555;
+            margin: 10px 0;
+        }
+
+        .senha {
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.753);
+            justify-content: center;
+            align-items: center;
+            display: flex;
+            border-radius: 7px;
+            color: #333;
+            border: 1px solid #fff;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: transform 0.5s;
+        }
+
+        .senha:hover {
+            transform: scale(1.05);
+        }
+
+        .clique {
+            position: relative;
+            top: 15px;
+            color: #444;
+            padding: 5px 10px;
+            background-color: rgba(255, 255, 255, 0.500);
+            border-radius: 7px;
+            text-align: center;
+            font-weight: 500;
+            visibility: hidden;
+            transition: all 0.5s ease-in-out;
+        }
+
+        .container-senha:hover .clique {
+            visibility: visible;
+            bottom: 10px;
+            opacity: 1;
+        }
+
+        .hide {
+            display: none;
+        }
+    </style>
+</head>
+
+
+<!--::::::::::::::::::::Meu documento HTML::::::::::::::::::::-->
+<body>
+    <h1>Gerador de Senhas</h1>
+    <main class="container-input">
+        <span>Tamanho <span id="valor"></span> caracteres</span>
+        <input id="slider" class="slider" type="range" min="5" max="25" value="15">
+        <button id="botao" class="botao" onclick="gerarSenha()">Gerar Senha</button>
+    </main>
+    <div id="container-senha" class="container-senha hide">
+        <span id="titulo" class="titulo">Sua senha gerada foi:</span>
+        <span id="senha" class="senha" onclick="copiarSenha()"></span>
+        <span class="clique">Clique na senha para copiar👆</span>
+    </div>
+
+
+    <!--::::::::::::::::::::Meus Scripts::::::::::::::::::::-->
+    <script>
+
+        //Setar variáveis aos elementos HTML
+        var slider = document.querySelector("#slider");
+        var botao = document.querySelector("#botao");
+
+        var tamanhoSenha = document.querySelector("#valor");
+        var senha = document.querySelector("#senha");
+
+        var containerSenha = document.querySelector("#container-senha");
+
+        var caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@$€?#&%©:;-=+*_/!";
+        var novaSenha = "";
+
+        var sintetizador = window.speechSynthesis;
+
+        //Manipulação do slider
+        tamanhoSenha.innerHTML = slider.value;
+
+        slider.oninput = function () {
+            tamanhoSenha.innerHTML = this.value;
+        }
+
+        //Função para gerar a senha
+        function gerarSenha() {
+            var passe = "";
+            for (var i = 0, n = caracteres.length; i < slider.value; ++i) {
+                passe += caracteres.charAt(Math.floor(Math.random() * n));
+            }
+
+            //Viabilizar a classe hide
+            containerSenha.classList.remove("hide");
+            senha.innerHTML = passe;
+
+            //Criar um objecto de fala para senha gerada
+            var fala = new SpeechSynthesisUtterance("A tua senha gerada é:" + passe);
+            fala.rate = 1;
+            fala.pitch = 1;
+            fala.volume = 2;
+            fala.lang = "pt-BR";
+            sintetizador.speak(fala);
+        }
+
+        //Função para copiar a senha gerada
+        function copiarSenha() {
+            alert("A tua senha foi copiada com sucesso !");
+            navigator.clipboard.writeText(novaSenha);
+
+            //Objecto de fala da senha copiada
+            var copiaSenha = new SpeechSynthesisUtterance("Senha copiada com sucesso!");
+            copiaSenha.rate = 1;
+            copiaSenha.pitch = 1;
+            copiaSenha.volume = 2;
+            copiaSenha.lang = "pt-BR";
+            sintetizador.speak(copiaSenha);
+        }
+    </script>
+    
+</body>
+</html>
